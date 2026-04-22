@@ -44,7 +44,7 @@ if __name__ == "__main__":
                 audio = r.listen(source, timeout=5, phrase_time_limit=5)
 
             word = r.recognize_google(audio)
-            if "jarvis" in word.lower:
+            if "jarvis" in word.lower():
                 speak("Yeah Master How it's going!")
                 #listen for the command
                 with sr.Microphone() as source:

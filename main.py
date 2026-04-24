@@ -2,9 +2,11 @@ import speech_recognition as sr
 import webbrowser
 import pyttsx3
 import musicLibrary
+import requests
 
 recognizer = sr.Recognizer()
 engine = pyttsx3.init()
+newsapi = "6f6861d1092442b2acfd6cd5688d6308"
 
 
 def speak(text):
@@ -25,14 +27,30 @@ def processCommand(c):
         song = c.lower().split(" ")[1]
         link = musicLibrary.music[song]
         webbrowser.open(link)
-        
+    
+    elif "news" in c.lower():
+        r = requests.get("https://newsapi.org/v2/top-headlines?country=us&apiKey=6f6861d1092442b2acfd6cd5688d6308")
+
+        # Check if request was successful (status code 200 = OK)
+        if r.status_code == 200:
+              data = r.json()  # Convert to dictionary
+    
+        # Extract only the "articles" list
+        articles = data.get("articles", [])
+
+        # print the headline
+        for article in articles:
+            speak(article['title'])
+    
+
+
 
 if __name__ == "__main__":
     speak("----Initializing Jarvis----")
 
     speak("Jarvis is online")
     while True:
-        #listen for the wake word "Isabella"
+        #listen for the wake word "Jarvis"
         # obtain audio from the microphone
         r = sr.Recognizer()
         

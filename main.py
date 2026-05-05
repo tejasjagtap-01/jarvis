@@ -3,10 +3,11 @@ import webbrowser
 import pyttsx3
 import musicLibrary
 import requests
+import os
+newsapi = os.getenv("NEWS_API_KEY")
 
 recognizer = sr.Recognizer()
 engine = pyttsx3.init()
-newsapi = "6f6861d1092442b2acfd6cd5688d6308"
 
 
 def speak(text):
@@ -16,19 +17,38 @@ def speak(text):
 
 def processCommand(c):
     cmd = c.lower()
-    if "google" in cmd:
-        speak("Opening Google")
+
+    if any(x in cmd for x in ["end jarvis","stop jarvis", "exit",'quit']):
+        print("Shutting down Jarvis.....")
+        return False
+
+
+    elif "google" in cmd:
+        print("Opening Google")
         webbrowser.open("https://www.google.com/")
-    elif "open youtube" in c.lower():
+    elif "youtube" in cmd:
+        print("Opening Youtube")
         webbrowser.open("https://www.youtube.com/")
-    elif "open mail" in c.lower():
+    elif "mail" in cmd:
+        print("Opening Gmail")
         webbrowser.open("https://www.gmail.com/")
-    elif "open linkedin" in c.lower():
+    elif "linkedin" in cmd:
+        print("Opening LinkdIn")
         webbrowser.open("https://www.linkedin.com/")
-    elif c.lower().startswith("play"):
-        song = c.lower().split(" ")[1]
-        link = musicLibrary.music[song]
-        webbrowser.open(link)
+    elif cmd.startswith("play"):
+        parts = cmd.split(" ")
+
+        if len(parts) < 2:
+            print("NO Song Specified")
+            return True
+        
+        song = " ".join(parts[1:])
+        link = musicLibrary.music.get(song)
+
+        if link:
+            webbrowser.open(link)
+        else:
+            print("Song Not Found")
     
     elif "news" in c.lower():
         url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={newsapi}"
@@ -55,8 +75,9 @@ def processCommand(c):
                print("Network error")
     
 
-    # else:
+    else:
         #Open Ai handling requests
+        pass
 
 
 if __name__ == "__main__":
@@ -84,7 +105,11 @@ if __name__ == "__main__":
                     audio = r.listen(source)
                     command = r.recognize_google(audio)
 
-                    processCommand(command)
+                    should_countinue = processCommand(command)
+
+                    if should_countinue is False:
+                        break
+                    # processCommand(command)
 
         except Exception as e:
             print("Error; {0}".format(e))
